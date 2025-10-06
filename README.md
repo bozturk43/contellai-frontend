@@ -1,6 +1,6 @@
 # ContellAI Frontend
 
-Bu repo, **ContellAI** projesinin kullanıcı arayüzünü (frontend) içerir. Proje, [ContellAI Backend](https://github.com/SENIN-KULLANICI-ADIN/contellai-backend) API'si ile iletişim kuran modern bir web uygulamasıdır.
+Bu repo, **ContellAI** projesinin kullanıcı arayüzünü (frontend) içerir. Proje, [ContellAI Backend](https://github.com/bozturk43/contellai-backend) API'si ile iletişim kuran modern bir web uygulamasıdır.
 
 ## 🚀 Projenin Amacı
 

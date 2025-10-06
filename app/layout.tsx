@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import ThemeRegistry from "@/ThemeRegistry"; // Yeni oluşturduğumuz ThemeRegistry'yi import et
+import ThemeRegistry from "@/ThemeRegistry";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Box } from "@mui/material";
+import QueryProvider from '@/providers/QueryProvider';
+import { AuthProvider } from '@/context/AuthContext';
+import { getMyProfile } from '@/lib/data';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,16 +13,30 @@ export const metadata: Metadata = {
   description: "Yapay Zeka Destekli Sosyal Medya İçerik Asistanı",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getMyProfile();
+
   return (
     <html lang="en">
       <body>
-        {/* Tüm uygulamayı ThemeRegistry ile sarmalıyoruz */}
-        <ThemeRegistry>{children}</ThemeRegistry>
+        {/* DÜZELTME BURADA: Sıralamayı değiştirdik */}
+        <QueryProvider>
+          <AuthProvider user={user}>
+            <ThemeRegistry>
+              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                <Navbar />
+                <main>
+                  {children}
+                </main>
+                <Footer />
+              </Box>
+            </ThemeRegistry>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -2,24 +2,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
-export type LoginPayload = {
-    email: string;
-    password: string;
-};
-
-export type UserProfile = {
-    id: string;
-    name: string;
-    email: string;
-    coinBalance: number;
-};
-
-export type LoginResponse = {
-    token: string;
-    user: UserProfile;
-};
-
+import { LoginPayload, LoginResponse, UserProfile } from '@/lib/types';
 
 // Mutation durumunu da dışarıya aktarabilmek için context tipini genişletiyoruz
 interface AuthContextType {
@@ -39,14 +22,12 @@ export const AuthProvider = ({ user: initialUser, children }: { user: UserProfil
     const [user, setUser] = useState<UserProfile | null>(initialUser);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
-    const queryClient = useQueryClient(); // TanStack Query client'ına erişim için
+    const queryClient = useQueryClient();
     useEffect(() => {
         setUser(initialUser);
         setIsLoading(false);
     }, [initialUser]);
-    // Login mutation'ını artık Context'in içinde tanımlıyoruz
     const loginMutation = useMutation({
-        // SENİN İSTEDİĞİN GİBİ: fetch mantığı artık doğrudan mutationFn içinde
         mutationFn: async (payload: LoginPayload): Promise<LoginResponse> => {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -61,10 +42,7 @@ export const AuthProvider = ({ user: initialUser, children }: { user: UserProfil
             return response.json();
         },
         onSuccess: (data) => {
-            // NAVBAR GÜNCELLEME SORUNUNUN ÇÖZÜMÜ:
-            // Gelen user verisiyle state'i ANINDA güncelle
             setUser(data.user);
-            // Sayfayı yönlendir
             router.push('/dashboard');
             router.refresh();
 
@@ -77,8 +55,8 @@ export const AuthProvider = ({ user: initialUser, children }: { user: UserProfil
 
     const logout = async () => {
         await fetch('/api/auth/logout', { method: 'POST' });
-        setUser(null); // Client state'ini anında temizle
-        queryClient.clear(); // Query cache'ini temizle
+        setUser(null); 
+        queryClient.clear();
         router.push('/login');
         router.refresh();
     };

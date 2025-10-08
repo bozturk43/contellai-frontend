@@ -1,8 +1,6 @@
 import { cookies } from 'next/headers';
 
-// Fonksiyonu 'async' olarak işaretledik
 const getAuthHeaders = async () => {
-    // cookies() fonksiyonunu 'await' ile bekliyoruz
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
 
@@ -15,7 +13,6 @@ const getAuthHeaders = async () => {
 };
 
 export const getMyProfile = async () => {
-    // getAuthHeaders artık async olduğu için onu da 'await' ile bekliyoruz
     const headers = await getAuthHeaders();
     if (!headers) return null;
 
@@ -28,14 +25,33 @@ export const getMyProfile = async () => {
 };
 
 export const getMyWorkspaces = async () => {
-    // getAuthHeaders artık async olduğu için onu da 'await' ile bekliyoruz
     const headers = await getAuthHeaders();
     if (!headers) return [];
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const response = await fetch(`${apiUrl}/api/workspaces`, { headers, cache: 'no-store' });
+    const response = await fetch(`${apiUrl}/api/workspaces/mine`, { headers, cache: 'no-store' });
 
     if (!response.ok) return [];
 
     return response.json();
 };
+export const getWorkspaceById = async (workspaceId: string) => {
+    const headers = await getAuthHeaders();
+    if (!headers) return null;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(`${apiUrl}/api/workspaces/${workspaceId}`, { headers, cache: 'no-store' });
+
+    if (!response.ok) return null;
+    return response.json();
+}
+export const getPostsByWorkspaceId = async (workspaceId: string) => {
+    const headers = await getAuthHeaders();
+    if (!headers) return [];
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(`${apiUrl}/api/contentposts/workspace/${workspaceId}`, { headers, cache: 'no-store' });
+
+    if (!response.ok) return [];
+    return response.json();
+}

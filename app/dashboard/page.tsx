@@ -1,23 +1,21 @@
 import { getMyProfile, getMyWorkspaces } from '@/lib/data';
-import { Typography, Box, Paper, List, ListItem, ListItemText } from '@mui/material';
+import { Typography, Box, Grid, Card, CardContent, CardActionArea } from '@mui/material';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Workspace } from '@/lib/types';
 
-// Bu artık bir Sunucu Bileşeni (Server Component)!
-// 'use client' yok, ve fonksiyon 'async'.
+
+
 export default async function DashboardPage() {
-    
-    // Verileri doğrudan sunucuda 'await' ile çekiyoruz
     const profile = await getMyProfile();
-    const workspaces = await getMyWorkspaces();
+    const workspaces: Workspace[] = await getMyWorkspaces();
 
-    // Eğer kullanıcı giriş yapmamışsa (cookie yoksa), profile null gelecek
-    // ve kullanıcıyı login sayfasına yönlendireceğiz.
     if (!profile) {
-        redirect('/login');
+        redirect('/auth/login');
     }
 
     return (
-        <Box sx={{ p: 4 }}>
+        <Box sx={{ p: 4, maxWidth: '1200px', margin: 'auto' }}>
             <Typography variant="h4" component="h1" gutterBottom>
                 Hoş Geldin, {profile.name}!
             </Typography>
@@ -29,20 +27,32 @@ export default async function DashboardPage() {
                 Çalışma Alanların
             </Typography>
 
-            <Paper elevation={2}>
-                <List>
-                    {workspaces.map((ws: any) => (
-                        <ListItem key={ws.id}>
-                            <ListItemText primary={ws.brandName} secondary={`ID: ${ws.id}`} />
-                        </ListItem>
-                    ))}
-                    {workspaces.length === 0 && (
-                        <ListItem>
-                            <ListItemText primary="Henüz bir çalışma alanınız yok." />
-                        </ListItem>
-                    )}
-                </List>
-            </Paper>
+            <Grid container spacing={3}>
+                {workspaces.map((ws) => (
+                    <Grid key={ws.id} size={{ xs: 12, md: 4 ,sm:6 }}>
+                        <Card sx={{ height: '100%' }}>
+                            <CardActionArea component={Link} href={`/dashboard/workspaces/${ws.id}`} sx={{ height: '100%' }}>
+                                <CardContent>
+                                    <Typography variant="h6" component="div">
+                                        {ws.brandName}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Sektör: {ws.industry || 'Belirtilmemiş'}
+                                    </Typography>
+                                </CardContent>
+                            </CardActionArea>
+                        </Card>
+                    </Grid>
+                ))}
+
+                {workspaces.length === 0 && (
+                     <Grid size={{ xs: 12}}>
+                        <Typography color="text.secondary">
+                            Henüz bir çalışma alanınız yok. Yeni bir tane oluşturun!
+                        </Typography>
+                     </Grid>
+                )}
+            </Grid>
         </Box>
     );
 }

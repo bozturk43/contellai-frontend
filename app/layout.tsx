@@ -23,7 +23,6 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* DÜZELTME BURADA: Sıralamayı değiştirdik */}
         <QueryProvider>
           <AuthProvider user={user}>
             <ThemeRegistry>

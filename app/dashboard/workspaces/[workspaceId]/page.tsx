@@ -1,8 +1,8 @@
 import { getWorkspaceById, getPostsByWorkspaceId } from '@/lib/data';
 import { redirect } from 'next/navigation';
-import WorkspaceClientPage from './WorkspaceClientPage'; // Yeni istemci bileşenimiz
+import WorkspaceClientPage from './WorkspaceClientPage';
 
-export default async function WorkspaceDetailPage({ params }: { params: { workspaceId: string } }) {
+export default async function WorkspaceDetailPage({ params }: { params: Promise<{ workspaceId: string }>}) {
     
     const awaitedParams = await params;
     

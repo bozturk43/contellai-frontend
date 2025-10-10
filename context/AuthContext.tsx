@@ -1,8 +1,10 @@
 'use client';
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { LoginPayload, LoginResponse, UserProfile } from '@/lib/types';
+import { getMyProfile } from '@/services/api/profile';
+
 
 // Mutation durumunu da dışarıya aktarabilmek için context tipini genişletiyoruz
 interface AuthContextType {
@@ -18,15 +20,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ user: initialUser, children }: { user: UserProfile | null, children: ReactNode }) => {
-    const [user, setUser] = useState<UserProfile | null>(initialUser);
-    const [isLoading, setIsLoading] = useState(true);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+
     const router = useRouter();
     const queryClient = useQueryClient();
-    useEffect(() => {
-        setUser(initialUser);
-        setIsLoading(false);
-    }, [initialUser]);
+    const { data: user, isLoading } = useQuery({
+        queryKey: ['profile'], // Bu sorgu için benzersiz anahtar: 'profile'
+        queryFn: getMyProfile, // Veriyi tazelemek için bu fonksiyonu çağıracak
+        retry: false, // Eğer ilk istekte hata alırsa (401 gibi), tekrar denemesin.
+        refetchOnWindowFocus: false, // Pencereye odaklanıldığında tekrar çekmesin.
+        staleTime: Infinity, // Otomatik olarak yeniden çekmesini engelle, biz manuel yapacağız
+    });
     const loginMutation = useMutation({
         mutationFn: async (payload: LoginPayload): Promise<LoginResponse> => {
             const response = await fetch('/api/auth/login', {
@@ -42,10 +46,19 @@ export const AuthProvider = ({ user: initialUser, children }: { user: UserProfil
             return response.json();
         },
         onSuccess: (data) => {
-            setUser(data.user);
-            router.push('/dashboard');
-            router.refresh();
 
+            console.log("Login başarılı, user verisi geldi:", data);
+
+            // 1. Önce state'i güncelle. Bu senkron bir işlemdir ve anında gerçekleşir.
+            queryClient.setQueryData(['profile'], data.user);
+            console.log("Query Cache güncellendi. Navbar'ın şimdi değişmesi lazım.");
+
+            // 2. Yönlendirmeyi 50 milisaniye gibi çok kısa bir süre geciktir.
+            //    Bu, React'e state değişikliğini fark edip arayüzü yeniden çizmesi için zaman tanır.
+            setTimeout(() => {
+                console.log("Yönlendirme (router.push) şimdi çalışıyor...");
+                router.push('/dashboard');
+            }, 50);
         },
     });
 
@@ -55,14 +68,12 @@ export const AuthProvider = ({ user: initialUser, children }: { user: UserProfil
 
     const logout = async () => {
         await fetch('/api/auth/logout', { method: 'POST' });
-        setUser(null); 
-        queryClient.clear();
+        queryClient.setQueryData(['profile'], null);
         router.push('/login');
-        router.refresh();
     };
 
     const value = {
-        user,
+        user: user || null,
         logout,
         login,
         loginMutation: {

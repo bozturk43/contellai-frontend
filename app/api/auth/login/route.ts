@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: data.message || 'Giriş başarısız' }, { status: apiResponse.status });
     }
 
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json(data);
     response.cookies.set('auth_token', data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== 'development',

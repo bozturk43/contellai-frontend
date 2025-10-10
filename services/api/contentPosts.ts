@@ -1,9 +1,6 @@
 import { CreateContentPostPayload, GeneratedContentResult, Post, SaveContentPostDto } from '@/lib/types';
 import { apiClient } from './apiClient';
 
-
-
-
 export const generateContentPreview = async (payload: CreateContentPostPayload): Promise<GeneratedContentResult> => {
   const response = await fetch('/api/content-posts/generate-preview', {
     method: 'POST',
@@ -19,7 +16,7 @@ export const generateContentPreview = async (payload: CreateContentPostPayload):
   return response.json();
 };
 export const getPostsByWorkspace = async (workspaceId: string): Promise<Post[]> => {
-    return apiClient<Post[]>(`/content-posts/workspace/${workspaceId}`);
+    return apiClient<Post[]>(`/content-posts/workspaces/${workspaceId}`);
 };
 export const saveContentPost = async (payload: SaveContentPostDto) => {
   const response = await fetch('/api/content-posts/save', {

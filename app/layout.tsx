@@ -18,13 +18,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getMyProfile();
 
   return (
     <html lang="en">
       <body>
         <QueryProvider>
-          <AuthProvider user={user}>
+          <AuthProvider >
             <ThemeRegistry>
               <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                 <Navbar />

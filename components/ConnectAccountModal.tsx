@@ -28,13 +28,12 @@ const ConnectAccountModal = ({ open, onClose, workspaceId }: Props) => {
     const mutation = useMutation({
         mutationFn: connectAccount,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['accounts', workspaceId] });
+            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceId] });
             handleCloseDialog();
         },
     });
 
     const onSubmit: SubmitHandler<FormData> = (data) => {
-        console.log("Form verisi:", data);
         mutation.mutate({
             workspaceId,
             platform: data.platform,

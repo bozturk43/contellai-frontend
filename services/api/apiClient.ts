@@ -1,28 +1,20 @@
-// Bu fonksiyon, tüm API isteklerimiz için merkezi bir nokta olacak.
 export const apiClient = async <T>(
-  endpoint: string,
+  endpoint: string, // örn: '/workspaces/123-abc'
   options: RequestInit = {}
 ): Promise<T> => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
-
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-    ...(token && { Authorization: `Bearer ${token}` }), // Koşullu ekleme
-  };
-
-  const response = await fetch(`${baseUrl}/api${endpoint}`, {
+  const response = await fetch(`/api${endpoint}`, {
     ...options,
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || `API isteği başarısız: ${response.statusText}`);
+    throw new Error(errorData.message || `API isteği başarısız: ${response.status}`);
   }
 
-  // Cevap gövdesi boş olabilecek DELETE gibi metotlar için kontrol
   if (response.status === 204) {
     return {} as T;
   }

@@ -18,6 +18,7 @@ export type LoginResponse = {
 export type Post = {
   id: string;
   generatedText: string;
+  generatedAssetUrl: string;
   createdAt: string;
   status: number;
   contentType: number;
@@ -76,4 +77,12 @@ export type CreateContentPostPayload = {
 export type GeneratedContentResult = {
   text: string;
   imageUrl: string;
+};
+
+export type CreateWorkspaceDto = {
+  brandName: string;
+  industry?: string;
+  targetAudience?: string;
+  brandTone?: string;
+  keywords?: string;
 };

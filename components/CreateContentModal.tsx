@@ -31,6 +31,8 @@ const CreateContentModal = ({ open, onClose, workspaceId }: Props) => {
         mutationFn: generateContentPreview,
         onSuccess: (data) => {
             setGeneratedContent(data);
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+
         },
     });
     const saveMutation = useMutation({
@@ -40,7 +42,6 @@ const CreateContentModal = ({ open, onClose, workspaceId }: Props) => {
                 const currentPosts = oldData ?? [];
                 return [newlySavedPost, ...currentPosts];
             });
-
             handleCloseDialog();
         }
     });

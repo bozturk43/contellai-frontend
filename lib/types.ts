@@ -86,3 +86,7 @@ export type CreateWorkspaceDto = {
   brandTone?: string;
   keywords?: string;
 };
+export type ChatMessage = {
+  sender: 'user' | 'ai';
+  text: string;
+};

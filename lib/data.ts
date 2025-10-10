@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { type Workspace, type Post, type UserProfile, CreateWorkspaceDto } from '@/lib/types'; 
+import { type Workspace, type Post, type UserProfile, CreateWorkspaceDto, ChatMessage } from '@/lib/types'; 
 import { revalidatePath } from 'next/cache';
 export async function serverFetcher<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const cookieStore = await cookies();
@@ -83,4 +83,16 @@ export async function createWorkspaceAction(payload: CreateWorkspaceDto) {
     revalidatePath('/dashboard');
 
     return newWorkspace;
+};
+export async function askAssistantAction(history: ChatMessage[], newMessage: string) {
+    const payload = {
+        history: history,
+        newMessage: newMessage
+    };
+    const response = await serverFetcher<{ reply: string }>('/api/assistant/chat', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+    return response.reply;
 }

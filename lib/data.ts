@@ -95,4 +95,10 @@ export async function askAssistantAction(history: ChatMessage[], newMessage: str
     });
 
     return response.reply;
-}
+};
+export async function clearChatHistoryAction() {
+    await serverFetcher('/api/assistant/history', {
+        method: 'DELETE',
+    });
+    revalidatePath('/dashboard');
+};

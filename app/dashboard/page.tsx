@@ -1,92 +1,36 @@
-'use client'; 
-import { useState, useRef, useEffect } from 'react';
-import { Typography, Box, TextField, Button, Paper, CircularProgress, Avatar } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
-import { useAuth } from '@/context/AuthContext';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
-import { ChatMessage } from '@/lib/types';
-import { askAssistantAction } from '@/lib/data';
-import { useTypewriter } from '@/hooks/useTypwriter';
+'use client';
+import { Typography, Box, Grid, Card, CardContent, Avatar } from '@mui/material';
+import ChatAssistant from '@/components/ChatAssistant';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import ArticleIcon from '@mui/icons-material/Article';
+import StatCard from '@/components/StatCard';
 
-const AiMessage = ({ text }: { text: string }) => {
-    const displayText = useTypewriter(text, 20);
-    return <Typography sx={{ whiteSpace: 'pre-wrap' }}>{displayText}</Typography>;
-};
 
 export default function DashboardPage() {
-    const { user } = useAuth();
-    const [messages, setMessages] = useState<ChatMessage[]>([
-        { sender: 'ai', text: `Merhaba ${user?.name || ''}! Ben Connie, senin yapay zeka asistanın. Uygulamayı nasıl kullanacağımı bana sorabilir veya sosyal medya ipuçları isteyebilirsin.` }
-    ]);
-    const [input, setInput] = useState('');
-    const chatEndRef = useRef<null | HTMLDivElement>(null);
-
-    const mutation = useMutation({
-        mutationFn: ({ history, newMessage }: { history: ChatMessage[], newMessage: string }) => askAssistantAction(history, newMessage),
-        onSuccess: (data) => {
-            setMessages(prev => [...prev, { sender: 'ai', text: data }]);
-        },
-        onError: (error) => {
-            setMessages(prev => [...prev, { sender: 'ai', text: `Üzgünüm, bir hata oluştu: ${error.message}` }]);
-        }
-    });
-
-    useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
-    const handleSend = () => {
-        if (!input.trim()) return;
-        
-        const userMessage: ChatMessage = { sender: 'user', text: input };
-        const newMessages = [...messages, userMessage];
-        setMessages(newMessages);
-        const history = newMessages.slice(-10); 
-        mutation.mutate({ history, newMessage: input });
-        setInput('');
-    };
 
     return (
-        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px - 58px - 48px)' /* Navbar, Footer ve padding'leri çıkar */ }}>
-            
-            {/* Mesajların gösterildiği alan */}
-            <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2, pr: 2 }}>
-                {messages.map((msg, index) => (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, gap: 2, flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row' }}>
-                        <Avatar sx={{ bgcolor: msg.sender === 'user' ? 'primary.main' : 'secondary.main' }}>
-                            {msg.sender === 'user' ? user?.name.charAt(0).toUpperCase() : <SmartToyIcon />}
-                        </Avatar>
-                        <Paper elevation={1} sx={{ p: 1.5, borderRadius: '16px', bgcolor: msg.sender === 'user' ? 'primary.light' : 'background.paper' }}>
-                            {msg.sender === 'ai' ? <AiMessage text={msg.text} /> : <Typography sx={{ whiteSpace: 'pre-wrap' }}>{msg.text}</Typography>}
-                        </Paper>
-                    </Box>
-                ))}
-                {mutation.isPending && 
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, gap: 2 }}>
-                        <Avatar sx={{ bgcolor: 'secondary.main' }}><SmartToyIcon /></Avatar>
-                        <Paper elevation={1} sx={{ p: 1.5, borderRadius: '16px' }}><CircularProgress size={20} /></Paper>
-                    </Box>
-                }
-                <div ref={chatEndRef} />
-            </Box>
-
-            {/* Mesaj giriş alanı */}
-            <Box
-                component="form"
-                onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                sx={{ display: 'flex', gap: 1, mt: 'auto' }}
-            >
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Uygulama hakkında bir soru sor veya bir ipucu iste..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    disabled={mutation.isPending}
-                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                />
-                <Button type="submit" variant="contained" disabled={mutation.isPending}>Gönder</Button>
-            </Box>
+        <Box>
+            <Grid container spacing={4} direction="column" alignItems="center">
+                {/* ÜST SATIR: İSTATİSTİK KARTLARI */}
+                <Grid size={{md:10,lg:8}} sx={{ width: '100%' }}>
+                    <Typography variant="h5" sx={{ mb: 2, textAlign: 'left' }}>Genel Bakış</Typography>
+                    <Grid container spacing={3}>
+                        <Grid size={{xs:12,sm:6,md:4}}>
+                            <StatCard title="Çalışma Alanları" value="..." icon={<BusinessCenterIcon />} />
+                        </Grid>
+                        <Grid size={{xs:12,sm:6,md:4}}>
+                            <StatCard title="Toplam İçerik" value="..." icon={<ArticleIcon />} />
+                        </Grid>
+                        <Grid size={{xs:12,sm:6,md:4}}>
+                            <StatCard title="Baglı Hesaplar" value="..." icon={<ArticleIcon />} />
+                        </Grid>
+                    </Grid>
+                </Grid>
+                {/* ALT SATIR: CHAT ASİSTANI */}
+                <Grid size={{xs:12,md:10,lg:8}} sx={{ width: '100%', height: '60vh' }}>
+                    <ChatAssistant />
+                </Grid>
+            </Grid>
         </Box>
     );
 }

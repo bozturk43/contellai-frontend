@@ -75,8 +75,8 @@ export type CreateContentPostPayload = {
 };
 
 export type GeneratedContentResult = {
-  text: string;
-  imageUrl: string;
+  generatedText: string;
+  generatedImageUrl: string;
 };
 
 export type CreateWorkspaceDto = {

@@ -50,8 +50,8 @@ const CreateContentModal = ({ open, onClose, workspaceId }: Props) => {
              const payload: SaveContentPostDto = {
                 workspaceId: workspaceId,
                 userPrompt: getValues("userPrompt"),
-                generatedText: generatedContent.text,
-                generatedAssetUrl: generatedContent.imageUrl,
+                generatedText: generatedContent.generatedText,
+                generatedAssetUrl: generatedContent.generatedImageUrl,
                 contentType: 1,
              };
              saveMutation.mutate(payload);
@@ -81,12 +81,12 @@ const CreateContentModal = ({ open, onClose, workspaceId }: Props) => {
                             <CardMedia
                                 component="img"
                                 height="300"
-                                image={generatedContent.imageUrl}
+                                image={generatedContent.generatedImageUrl}
                                 alt="AI Generated Image"
                             />
                             <Box sx={{ p: 2 }}>
                                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                                    {generatedContent.text}
+                                    {generatedContent.generatedText}
                                 </Typography>
                             </Box>
                         </Card>

@@ -1,12 +1,21 @@
-'use client';
 import { Typography, Box, Grid, Card, CardContent, Avatar } from '@mui/material';
 import ChatAssistant from '@/components/ChatAssistant';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import ArticleIcon from '@mui/icons-material/Article';
 import StatCard from '@/components/StatCard';
+import { getMyWorkspaces } from '@/lib/data';
 
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+    
+     const [workspaces] = await Promise.all([
+        getMyWorkspaces(),
+    ]);
+    const stats = {
+        workspaceCount: workspaces?.length ?? 0,
+        totalPostCount: workspaces?.reduce((sum, ws) => sum + ws.postCount, 0) ?? 0,
+        totalAccountCount: workspaces?.reduce((sum, ws) => sum + ws.accountCount, 0) ?? 0,
+    };
 
     return (
         <Box>
@@ -16,13 +25,13 @@ export default function DashboardPage() {
                     <Typography variant="h5" sx={{ mb: 2, textAlign: 'left' }}>Genel Bakış</Typography>
                     <Grid container spacing={3}>
                         <Grid size={{xs:12,sm:6,md:4}}>
-                            <StatCard title="Çalışma Alanları" value="..." icon={<BusinessCenterIcon />} />
+                            <StatCard title="Çalışma Alanları" value={stats.workspaceCount} icon={<BusinessCenterIcon />} />
                         </Grid>
                         <Grid size={{xs:12,sm:6,md:4}}>
-                            <StatCard title="Toplam İçerik" value="..." icon={<ArticleIcon />} />
+                            <StatCard title="Toplam İçerik" value={stats.totalPostCount} icon={<ArticleIcon />} />
                         </Grid>
                         <Grid size={{xs:12,sm:6,md:4}}>
-                            <StatCard title="Baglı Hesaplar" value="..." icon={<ArticleIcon />} />
+                            <StatCard title="Baglı Hesaplar" value={stats.totalAccountCount} icon={<ArticleIcon />} />
                         </Grid>
                     </Grid>
                 </Grid>

@@ -2,23 +2,24 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Container, Box, Typography, TextField, Button, Alert, CircularProgress } from '@mui/material';
-import { LoginPayload, useAuth } from '@/context/AuthContext';
+import { Container, Box, Typography, TextField, Button, Alert, CircularProgress, Grid, Link } from '@mui/material';
+import { useAuth } from '@/context/AuthContext';
 import * as z from 'zod';
+import { LoginPayload } from '@/lib/types';
 
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Geçerli bir e-posta adresi giriniz.' }),
-  password: z.string().min(1, { message: 'Şifre alanı boş bırakılamaz.' }),
+    email: z.string().email({ message: 'Geçerli bir e-posta adresi giriniz.' }),
+    password: z.string().min(1, { message: 'Şifre alanı boş bırakılamaz.' }),
 });
 
 const LoginPage = () => {
     const { login, loginMutation } = useAuth();
-    
-    const { 
-        register, 
-        handleSubmit, 
-        formState: { errors } 
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
     } = useForm<LoginPayload>({
         resolver: zodResolver(loginSchema),
     });
@@ -49,6 +50,13 @@ const LoginPage = () => {
                         {loginMutation.isPending ? <CircularProgress size={24} /> : 'Giriş Yap'}
                     </Button>
                 </Box>
+                <Grid container justifyContent="flex-end">
+                    <Grid>
+                        <Link href="/register" variant="body2">
+                            {"Hesabın yok mu? Kayıt Ol"}
+                        </Link>
+                    </Grid>
+                </Grid>
             </Box>
         </Container>
     );

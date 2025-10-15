@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Typography, Box, Grid, Card, CardContent, CardActionArea, Button, CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { getMyWorkspaces } from '@/lib/data'; // Sunucu fonksiyonunu import ediyoruz
 import { type Workspace } from '@/lib/types';
 import CreateWorkspaceModal from '@/components/CreateWorkspaceModal';
 import { getMyWorkspacesClient } from '@/services/api/workspaces';

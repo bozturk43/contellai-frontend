@@ -35,6 +35,8 @@ export type Workspace = {
   brandName: string;
   industry: string;
   connectedAccounts: Account[];
+  postCount : number | 0;
+  accountCount: number | 0;
 };
 
 export enum PlatformType {
@@ -89,4 +91,9 @@ export type CreateWorkspaceDto = {
 export type ChatMessage = {
   sender: 'user' | 'ai';
   text: string;
+};
+export type RegisterPayload = {
+  name: string;
+  email: string;
+  password: string;
 };

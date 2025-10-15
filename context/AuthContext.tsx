@@ -2,8 +2,9 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LoginPayload, LoginResponse, UserProfile } from '@/lib/types';
+import { LoginPayload, LoginResponse, RegisterPayload, UserProfile } from '@/lib/types';
 import { getMyProfile } from '@/services/api/profile';
+import { registerUser } from '@/services/api/auth';
 
 
 // Mutation durumunu da dışarıya aktarabilmek için context tipini genişletiyoruz
@@ -11,6 +12,11 @@ interface AuthContextType {
     user: UserProfile | null;
     logout: () => Promise<void>;
     login: (data: LoginPayload) => void;
+    register: (data: RegisterPayload) => void;
+    registerMutation: { 
+        isPending: boolean; 
+        isError: boolean; 
+        error: Error | null; };
     loginMutation: {
         isPending: boolean;
         isError: boolean;
@@ -61,6 +67,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }, 50);
         },
     });
+    const registerMutation = useMutation({
+        mutationFn: registerUser,
+        onSuccess: (data) => {
+            // Başarı durumu login ile aynı!
+            queryClient.setQueryData(['profile'], data.user);
+            router.push('/dashboard');
+        },
+    });
+    const register = (data: RegisterPayload) => {
+        registerMutation.mutate(data);
+    };
 
     const login = (data: LoginPayload) => {
         loginMutation.mutate(data);
@@ -76,10 +93,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user: user || null,
         logout,
         login,
+        register,
         loginMutation: {
             isPending: loginMutation.isPending,
             isError: loginMutation.isError,
             error: loginMutation.error,
+        },
+        registerMutation: {
+            isPending: registerMutation.isPending,
+            isError: registerMutation.isError,
+            error: registerMutation.error,
         }
     };
 

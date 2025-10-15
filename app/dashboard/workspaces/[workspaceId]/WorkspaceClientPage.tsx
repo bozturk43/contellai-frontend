@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Button, Divider, Grid, CircularProgress, Avatar, Chip,Breadcrumbs,Link as MuiLink } from '@mui/material';
+import { Typography, Box, Paper, List, ListItem, ListItemText, Button, Divider, Grid, CircularProgress, Avatar, Chip, Breadcrumbs, Link as MuiLink } from '@mui/material';
 import CreateContentModal from '@/components/CreateContentModal';
 import ConnectAccountModal from '@/components/ConnectAccountModal';
 import { useQuery } from '@tanstack/react-query';
@@ -10,10 +10,12 @@ import { getPostsByWorkspace } from '@/services/api/contentPosts';
 import { type Workspace, type Post, type Account } from '@/lib/types';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'; // Ayırıcı ikon
-
+import { motion } from 'framer-motion'; // Framer Motion'ı import et
 import { Instagram } from '@mui/icons-material';
 import PostCard from '@/components/PostCard';
 import AddIcon from '@mui/icons-material/Add'; // "Ekle" butonu için ikon
+import PostCardSkeleton from '@/components/PostCardSkeleton'; // Yeni iskelet bileşenini import et
+
 
 
 
@@ -38,7 +40,23 @@ export default function WorkspaceClientPage({ workspace, initialPosts }: Props) 
         initialData: initialPosts,
     });
     const connectedAccounts = currentWorkspace?.connectedAccounts ?? [];
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1, // Her bir kartın 0.1 saniye arayla gelmesini sağla
+            },
+        },
+    };
 
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+        },
+    };
 
     return (
 
@@ -85,12 +103,19 @@ export default function WorkspaceClientPage({ workspace, initialPosts }: Props) 
             <Typography variant="h5" component="h2" sx={{ mb: 2 }}>
                 Oluşturulan İçerikler
             </Typography>
-
-            {isPostsLoading ? <CircularProgress /> : (
-                <Grid container spacing={3}>
+            {isPostsLoading ? <Grid container spacing={2}>
+                {[1, 2, 3].map((n) => (
+                    <Grid size={{ xs: 12, sm: 6 }} key={n}>
+                        <PostCardSkeleton />
+                    </Grid>
+                ))}
+            </Grid> : (
+                <Grid container spacing={3} component={motion.div} variants={containerVariants} initial="hidden" animate="visible">
                     {posts?.map((post) => (
                         <Grid key={post.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-                            <PostCard post={post} workspace={workspace} />
+                            <motion.div variants={itemVariants}>
+                                <PostCard post={post} workspace={workspace} />
+                            </motion.div>
                         </Grid>
                     ))}
                 </Grid>

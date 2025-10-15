@@ -14,7 +14,7 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post, workspace }: PostCardProps) => {
-     const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const TRUNCATE_LENGTH = 125;
 
@@ -22,11 +22,21 @@ const PostCard = ({ post, workspace }: PostCardProps) => {
         setIsExpanded(!isExpanded);
     };
 
-    const displayText = isExpanded 
-        ? post.generatedText 
+    const displayText = isExpanded
+        ? post.generatedText
         : `${post.generatedText.substring(0, TRUNCATE_LENGTH)}...`;
     return (
-        <Card sx={{ maxWidth: 345, width: '100%' }}>
+        <Card sx={{
+            maxWidth: 345,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+            '&:hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: 6,
+            }
+        }}>
             <CardHeader
                 avatar={
                     <Avatar sx={{ bgcolor: 'secondary.main' }} aria-label="recipe">
